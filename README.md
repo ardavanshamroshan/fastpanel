@@ -1,662 +1,522 @@
 # FastShop
 
-> A production-style FastAPI learning roadmap disguised as an e-commerce admin panel backend.
+> Development roadmap · Architecture document · Learning guide
 
-**FastShop** is not only a coding project. It is a complete FastAPI / Python backend learning path for a senior Laravel developer who wants to understand *why* every line, library, and architectural decision exists — not just how to copy patterns.
+**FastShop** is a production-style e-commerce **administration panel**. It is also a complete FastAPI / Python backend learning path for an experienced **Laravel** developer.
+
+This README is the source of truth. It must evolve with the project. Do not treat it as a one-time project blurb.
 
 | | |
 |---|---|
-| **Type** | Modular monolith API + React admin |
-| **Domain** | E-commerce administration panel |
-| **Audience** | Senior Laravel → FastAPI / Python |
-| **Goal** | Deep understanding → production habits → future AI backends |
+| **Backend** | Python · FastAPI · PostgreSQL |
+| **Frontend** | React · **JavaScript** · Tailwind · Shadcn UI |
+| **Architecture** | Laravel-inspired modular monolith |
+| **Frontend language** | **JavaScript only — no TypeScript** |
+| **Goal before AI engineering** | One complete, understood production-style system |
 
 ---
 
 ## Table of Contents
 
-1. [Project Overview](#project-overview)
-2. [Learning Philosophy](#learning-philosophy)
-3. [Tech Stack](#tech-stack)
-4. [Architecture](#architecture)
-5. [Laravel → FastAPI Translation](#laravel--fastapi-translation)
-6. [Folder Structure Evolution](#folder-structure-evolution)
-7. [Database Design](#database-design)
-8. [Development Roadmap](#development-roadmap)
-9. [Coding Rules](#coding-rules)
-10. [Commands](#commands)
-11. [Learning Notes](#learning-notes)
+1. [Project Goal](#project-goal)
+2. [Learning Style](#learning-style)
+3. [Architecture Style](#architecture-style)
+4. [Backend Structure](#backend-structure)
+5. [Module File Guide](#module-file-guide)
+6. [Libraries](#libraries)
+7. [Frontend Stack](#frontend-stack)
+8. [Laravel → FastAPI Translation](#laravel--fastapi-translation)
+9. [Database Design](#database-design)
+10. [Coding Rules](#coding-rules)
+11. [Feature-Based Development Roadmap](#feature-based-development-roadmap)
+12. [Commands](#commands)
+13. [Living Learning Log](#living-learning-log)
+14. [Definition of Done](#definition-of-done)
 
 ---
 
-## Project Overview
+## Project Goal
 
-### What we build
+Build **one complete admin system** while learning:
 
-A simple e-commerce **administration panel backend** with:
+- FastAPI deeply (not surface tutorials)
+- Professional Python backend habits
+- How every Laravel concept maps to Python/FastAPI
+- Why every library exists
+- Why every folder and file exists
+- Why every architectural decision exists
 
-| Area | Features |
-|------|----------|
-| **Auth** | Registration, login, JWT, password hashing (Argon2) |
-| **Authorization** | Roles, permissions, policy-style checks |
-| **Users** | CRUD, role assignment |
-| **Catalog** | Products, categories |
-| **Content** | Posts (CMS-style) |
-| **Dashboard** | Stats, aggregations |
-| **API** | REST JSON API |
-| **Frontend** | React + Shadcn UI admin |
+Then move into AI backend work on top of solid foundations.
 
-### What we deliberately do *not* build (yet)
+### Domain scope
+
+| Area | Scope |
+|------|--------|
+| Authentication | Register, login, JWT, Argon2 |
+| Authorization | Roles, permissions, policies |
+| Users | Admin CRUD |
+| Catalog | Categories, products, image upload |
+| Content | Posts (simple CMS) |
+| Dashboard | Stats / aggregation APIs |
+| Frontend | React JS admin panel |
+
+### Out of scope (for now)
 
 - Microservices
-- Event sourcing
-- CQRS as a religion
-- Hexagonal “ports everywhere”
-- Premature multi-tenant SaaS complexity
-
-We build a **modular monolith**: clear module boundaries inside one deployable app. Good enough for small SaaS and medium apps; ready to extract modules later if needed.
-
-### Future direction
-
-After FastShop foundations are solid:
-
-- Background AI jobs (embeddings, classification, summaries)
-- Streaming responses
-- Tool-calling backends
-- Observability for LLM costs / latency
-
-The same modular layout scales into AI features without rewriting the app.
+- TypeScript
+- Enterprise over-engineering (ports/adapters everywhere, unused interfaces)
+- Full storefront checkout / payments
 
 ---
 
-## Learning Philosophy
+## Learning Style
 
-This project exists to understand:
+For **every** implementation step, document:
 
-1. **Why every line exists** — not cargo-cult snippets
-2. **Why every dependency exists** — what problem it solves
-3. **Why every architecture decision exists** — trade-offs, not dogma
+| Lens | Question |
+|------|----------|
+| **What?** | What are we building right now? |
+| **Why?** | Why this approach / library / folder? |
+| **How?** | Concrete steps and patterns |
+| **Laravel equivalent?** | What did I already know under another name? |
+| **Common mistakes?** | What traps should I avoid? |
 
-### Avoid copy/paste development
+### Habit rules
 
-Before writing or accepting any implementation step, answer:
+- Avoid copy/paste without understanding.
+- Finish a phase before starting the next.
+- After each completed phase, append to [Living Learning Log](#living-learning-log):
+  - lessons learned
+  - architecture decisions
+  - new libraries
+  - problems solved
 
-| Question | Purpose |
-|----------|---------|
-| **What** are we building? | Scope clarity |
-| **Why** this way? | Design intent |
-| **What problem** does it solve? | Avoid accidental complexity |
-| **Laravel equivalent?** | Transfer existing mental models |
-| **Python / FastAPI concept?** | Name the new tool correctly |
+### Mental shift: Laravel → Python
 
-### How to use this README
-
-1. Read the phase goal and concepts **before** coding.
-2. Implement only that phase.
-3. Fill [Learning Notes](#learning-notes) after each phase.
-4. Do not skip Phase 0 (Python mental models). Laravel seniority does not replace Python fluency.
-
-### Mentality shift: Laravel → Python
-
-| Laravel habit | Python / FastAPI habit |
-|---------------|------------------------|
-| Framework provides almost everything | You compose libraries |
-| `artisan make:*` scaffolds | You create files intentionally |
-| Service container is magical | DI is explicit (`Depends`) |
-| Eloquent is the default ORM style | SQLAlchemy 2.0 is explicit / typed |
-| Facades hide wiring | Imports and constructors show wiring |
-| “Convention over configuration” | “Configuration you can see” |
+| Laravel habit | FastShop habit |
+|---------------|----------------|
+| Framework ships almost everything | You compose libraries |
+| `artisan make:*` | You create files with intention |
+| Service container feels magical | DI is visible (`Depends`, constructors) |
+| Facades hide imports | Imports show wiring |
+| Convention over configuration | Configuration you can see |
+| Blade / Inertia optional | Separate React JS SPA + JSON API |
 
 ---
 
-## Tech Stack
+## Architecture Style
 
-For each tool: **what**, **why**, **Laravel equivalent**, **where in FastShop**.
+### Modular monolith (Laravel-inspired)
 
-### Backend
+One deployable backend. Features live in **modules**. Cross-cutting pieces live in familiar Laravel-shaped folders (`config/`, `routes/`, `database/`, `app/`).
 
-#### Python
+```text
+FastShop/
+├── backend/
+│   ├── app/
+│   ├── config/
+│   ├── database/
+│   │   ├── migrations/
+│   │   └── seeders/
+│   ├── routes/
+│   ├── storage/
+│   ├── public/
+│   ├── modules/
+│   └── tests/
+└── frontend/          # React + JavaScript (no TypeScript)
+```
 
-| | |
-|---|---|
-| **What** | Language runtime and ecosystem |
-| **Why** | Native async, typing, data/AI ecosystem, FastAPI home |
-| **Laravel eq.** | PHP |
-| **Where** | Entire backend |
+### Why this structure?
+
+| Reason | Detail |
+|--------|--------|
+| Familiar mental map | Laravel seniors navigate `config`, `routes`, `database`, feature folders quickly |
+| Module ownership | Auth, users, products, … change independently |
+| One deployable | Correct size for small/medium SaaS and learning |
+| Future AI work | New modules (e.g. `ai/`) plug in without a rewrite |
+| Not microservices | Avoid ops noise while learning FastAPI |
+
+### What is Laravel-inspired?
+
+| Idea | In FastShop |
+|------|-------------|
+| `config/` | Typed settings modules |
+| `routes/` | Central route registration |
+| `database/migrations` | Alembic revisions (same *role*) |
+| `database/seeders` | Seed scripts |
+| `app/` providers / middleware / exceptions | Core bootstrap concerns |
+| Feature modules | Closer to domain modules / packages than classic `app/Http/Controllers` dump |
+| Policies | `policies.py` per module |
+| Service + repository split | Explicit layers (common in larger Laravel apps) |
+
+### What is Python / FastAPI-specific?
+
+| Idea | Detail |
+|------|--------|
+| ASGI + Uvicorn | Process model ≠ PHP-FPM |
+| Pydantic schemas | Runtime validation + OpenAPI |
+| `Depends()` | First-class request DI (not a ServiceProvider class tree) |
+| SQLAlchemy 2 session | Explicit session lifecycle ≠ Eloquent facades |
+| Alembic | Migration engine tied to SQLAlchemy metadata |
+| JWT via PyJWT | Library choice, not framework Sanctum |
+| ARQ + Redis | Async-native jobs preferred for FastAPI learning |
+| No Blade | Frontend is a separate React SPA |
+
+**Rule:** Steal Laravel *clarity*. Do not fake PHP frameworks inside Python.
+
+---
+
+## Backend Structure
+
+```text
+backend/
+├── app/
+│   ├── main.py              # ASGI entry / app factory
+│   ├── providers/           # Bootstrap wiring (DI setup, startup hooks)
+│   ├── middleware/          # HTTP / ASGI cross-cutting
+│   ├── exceptions/          # Exception types + handlers
+│   └── helpers/             # Small shared pure helpers
+│
+├── config/
+│   ├── settings.py          # pydantic-settings (env)
+│   ├── database.py          # Engine / session factory config
+│   └── security.py          # JWT, password, CORS-related settings
+│
+├── routes/
+│   ├── api.py               # Mount API routers from modules
+│   └── web.py               # Optional non-API routes (health, docs redirects)
+│
+├── database/
+│   ├── connection.py        # Engine, SessionLocal, get_db
+│   ├── migrations/          # Alembic versions (or alembic/ versions linked here)
+│   └── seeders/             # Roles, admin user, demo data
+│
+├── storage/                 # Uploads, generated files (local disk; S3 later)
+├── public/                  # Static public assets if needed
+│
+├── modules/                 # Feature modules (see below)
+│
+└── tests/                   # Mirror modules + integration tests
+```
+
+### Folder responsibilities
+
+| Folder | Owns | Must not own |
+|--------|------|--------------|
+| `app/` | Bootstrap, middleware, global exceptions, helpers | Product/business use cases |
+| `config/` | Typed configuration | Runtime business rules |
+| `routes/` | Route *registration* only | Fat handlers |
+| `database/` | Connection, migrations, seeders | HTTP |
+| `modules/` | Feature use cases end-to-end | Random shared junk |
+| `storage/` | Files on disk | Business decisions |
+| `tests/` | Verification | Production imports of test utils into app code |
+
+### Target module map
+
+```text
+modules/
+├── auth/
+├── users/
+├── roles/
+├── permissions/
+├── products/
+├── categories/
+├── posts/
+└── dashboard/
+```
+
+### Request flow
+
+```text
+HTTP
+  → routes/api.py (registration)
+    → module router.py
+      → schemas.py (validate in / shape out)
+      → policies / auth dependencies
+      → service.py (business rules)
+        → repository.py (SQL)
+          → PostgreSQL
+```
+
+---
+
+## Module File Guide
+
+Every feature module follows the same shape:
+
+```text
+modules/<feature>/
+├── router.py
+├── service.py
+├── repository.py
+├── models.py
+├── schemas.py
+├── policies.py
+└── events.py
+```
+
+| File | Role | Laravel analogue | Rules |
+|------|------|------------------|-------|
+| **`router.py`** | HTTP layer: path, status codes, Depends, call service | Controller + `routes/api.php` entry | Thin. No business rules. No SQL. |
+| **`service.py`** | Business logic and orchestration | Service / Action classes | Talks to repositories and other services. No raw query soup. |
+| **`repository.py`** | Database operations | Repository / Eloquent query objects | SQLAlchemy lives here. No HTTP. |
+| **`models.py`** | SQLAlchemy models | Eloquent models | Persistence shape, relationships. Not API output. |
+| **`schemas.py`** | Pydantic validation + response serialization | Form Request + API Resource | Input/output contracts. |
+| **`policies.py`** | Authorization rules | Policy + Gate checks | “Can this user do X on this resource?” |
+| **`events.py`** | Domain events raised by the module | Events | Keep payloads small; listeners elsewhere or nearby. |
+
+### Layer cheat sheet
+
+| Layer | May | Must not |
+|-------|-----|----------|
+| Router | Parse HTTP, authorize deps, return schema | Business rules, SQL |
+| Service | Rules, transactions orchestration | Scatter query details |
+| Repository | Queries, persistence | Know about Request / JWT |
+| Schema | Validate / serialize | Hit DB |
+| Policy | Allow / deny | Mutate domain as side effect of “check” |
+
+---
+
+## Libraries
+
+For each dependency: **what · why · Laravel equivalent · where**.
+
+### Foundation
 
 #### FastAPI
 
 | | |
 |---|---|
 | **What** | Modern ASGI web framework for APIs |
-| **Why** | OpenAPI auto-docs, first-class async, Pydantic validation, DI via `Depends` |
-| **Laravel eq.** | Laravel HTTP kernel + routing + Form Requests (partial) |
-| **Where** | `app/main.py`, routers, dependencies |
+| **Why** | OpenAPI docs, async, DI via `Depends`, Pydantic integration |
+| **Laravel** | Routing + HTTP kernel + partial Form Request behavior |
+| **Where** | `app/main.py`, module `router.py`, dependencies |
+
+#### Uvicorn
+
+| | |
+|---|---|
+| **What** | ASGI server |
+| **Why** | Run FastAPI in dev and prod (or behind a reverse proxy) |
+| **Laravel** | `php artisan serve` / php-fpm / Octane (different model) |
+| **Where** | Process entry: `uvicorn app.main:app` |
+
+### Validation & config
 
 #### Pydantic
 
 | | |
 |---|---|
-| **What** | Data validation and serialization via type hints |
-| **Why** | Request/response contracts; replace ad-hoc arrays and `$casts` |
-| **Laravel eq.** | Form Requests + API Resources / DTOs |
-| **Where** | `schemas/` in each module |
+| **What** | Data validation and serialization from type hints |
+| **Why** | Request/response contracts; automatic OpenAPI schemas |
+| **Laravel** | Form Requests + API Resources / DTOs |
+| **Where** | Every module `schemas.py` |
 
 #### pydantic-settings
 
 | | |
 |---|---|
-| **What** | Settings loaded from env / `.env` into typed objects |
-| **Why** | Fail fast on bad config; no scattered `os.getenv` |
-| **Laravel eq.** | `config/*.php` + `.env` |
-| **Where** | `app/core/config.py` |
+| **What** | Load `.env` / environment into typed Settings |
+| **Why** | Fail fast on bad config; one settings object |
+| **Laravel** | `.env` + `config/*.php` |
+| **Where** | `config/settings.py` (and friends) |
 
-#### SQLAlchemy 2.0
+### Database
 
-| | |
-|---|---|
-| **What** | SQL toolkit + ORM (2.0 style: typed, explicit) |
-| **Why** | Production ORM, clear session lifecycle, powerful queries |
-| **Laravel eq.** | Eloquent + Query Builder |
-| **Where** | `models/`, repositories, `core/database.py` |
-
-#### PostgreSQL
+#### SQLAlchemy 2
 
 | | |
 |---|---|
-| **What** | Relational database |
-| **Why** | Constraints, JSON, full-text, reliability for admin data |
-| **Laravel eq.** | MySQL / PostgreSQL via Laravel |
-| **Where** | All persistent entities |
+| **What** | SQL toolkit + ORM (2.0 typed style) |
+| **Why** | Explicit sessions, strong querying, production ORM |
+| **Laravel** | Eloquent + Query Builder |
+| **Where** | `models.py`, `repository.py`, `database/connection.py` |
+
+#### psycopg
+
+| | |
+|---|---|
+| **What** | PostgreSQL driver for Python |
+| **Why** | Speak to Postgres from SQLAlchemy |
+| **Laravel** | `pdo_pgsql` / DB driver under the hood |
+| **Where** | Connection URL / engine setup |
 
 #### Alembic
 
 | | |
 |---|---|
-| **What** | Database migration tool for SQLAlchemy |
-| **Why** | Versioned schema like Laravel migrations |
-| **Laravel eq.** | `database/migrations` + `artisan migrate` |
-| **Where** | `alembic/`, `alembic.ini` |
+| **What** | Migration tool for SQLAlchemy |
+| **Why** | Versioned schema changes |
+| **Laravel** | `database/migrations` + `artisan migrate` |
+| **Where** | `database/migrations/` (Alembic env wired here) |
+
+### Authentication
 
 #### pwdlib\[argon2]
 
 | | |
 |---|---|
-| **What** | Password hashing helpers; Argon2 backend |
-| **Why** | Modern hashing; avoid rolling your own crypto |
-| **Laravel eq.** | `Hash::make` / `Hash::check` (bcrypt by default) |
+| **What** | Password hashing helpers with Argon2 |
+| **Why** | Modern hashing; no hand-rolled crypto |
+| **Laravel** | `Hash::make` / `Hash::check` |
 | **Where** | Auth service (register / login) |
 
 #### PyJWT
 
 | | |
 |---|---|
-| **What** | Encode / decode JSON Web Tokens |
-| **Why** | Stateless API auth for SPA frontend |
-| **Laravel eq.** | Laravel Sanctum token auth or JWT packages (less built-in) |
-| **Where** | Auth module, security dependencies |
+| **What** | Encode and decode JWTs |
+| **Why** | Stateless API auth for React SPA |
+| **Laravel** | Sanctum tokens or JWT packages |
+| **Where** | Auth module, security helpers, `Depends(get_current_user)` |
 
-#### Redis
-
-| | |
-|---|---|
-| **What** | In-memory store |
-| **Why** | Cache, rate limits, queue broker / job backend |
-| **Laravel eq.** | Redis for cache / queues |
-| **Where** | Cache layer, ARQ/Celery, optional sessions |
-
-#### ARQ or Celery
-
-| | |
-|---|---|
-| **What** | Background job runners (pick one; ARQ is async-native and lighter; Celery is the Laravel-Queue-scale veteran) |
-| **Why** | Emails, reports, AI tasks off the request path |
-| **Laravel eq.** | Queues + Jobs |
-| **Where** | `app/core/queue/`, job modules (Phase 9) |
-
-> **Decision later:** Prefer **ARQ** for a FastAPI-first async learning path unless you need Celery’s ecosystem. Document the choice in Learning Notes.
+### Testing & quality
 
 #### pytest
 
 | | |
 |---|---|
 | **What** | Python test framework |
-| **Why** | Fixtures, parametrize, FastAPI `TestClient` / httpx |
-| **Laravel eq.** | PHPUnit / Pest |
+| **Why** | Fixtures, API tests with httpx / TestClient |
+| **Laravel** | PHPUnit / Pest |
 | **Where** | `tests/` |
 
 #### Ruff
 
 | | |
 |---|---|
-| **What** | Extremely fast linter + formatter |
-| **Why** | One tool instead of flake8 + isort + black chaos |
-| **Laravel eq.** | Pint / PHP-CS-Fixer |
-| **Where** | CI + local `ruff check` / `ruff format` |
+| **What** | Fast linter + formatter |
+| **Why** | One tool for style and many lint rules |
+| **Laravel** | Pint / PHP-CS-Fixer |
+| **Where** | Local + CI |
 
-#### Docker
-
-| | |
-|---|---|
-| **What** | Container runtime / Compose |
-| **Why** | Reproducible Postgres, Redis, API, frontend |
-| **Laravel eq.** | Laravel Sail / Docker Compose |
-| **Where** | `Dockerfile`, `docker-compose.yml` (Phase 10) |
-
-#### uv (tooling)
+#### httpx
 
 | | |
 |---|---|
-| **What** | Fast Python package + project manager |
-| **Why** | Replaces slow pip/venv rituals; lockfile; `uv run` |
-| **Laravel eq.** | Composer |
-| **Where** | `pyproject.toml`, `uv.lock` |
+| **What** | Modern HTTP client |
+| **Why** | Call external APIs; test FastAPI apps |
+| **Laravel** | HTTP client facades / Guzzle |
+| **Where** | Tests, integrations, optional outbound calls |
+
+### Cache & jobs
+
+#### Redis
+
+| | |
+|---|---|
+| **What** | In-memory data store |
+| **Why** | Cache, rate limits, job broker for ARQ |
+| **Laravel** | Redis for cache / queues |
+| **Where** | Phase 10+ queue/cache infrastructure |
+
+#### ARQ
+
+| | |
+|---|---|
+| **What** | Async Redis job queue for Python |
+| **Why** | Background work without leaving the async FastAPI world |
+| **Laravel** | Queues + Jobs (`ShouldQueue`) |
+| **Where** | Workers, job definitions (Phase 10) |
+
+### Tooling (not a runtime dep, but required)
+
+#### uv
+
+| | |
+|---|---|
+| **What** | Fast Python package / project manager |
+| **Why** | Lockfile, speed, `uv run` |
+| **Laravel** | Composer |
+| **Where** | `pyproject.toml`, day-to-day commands |
 
 ---
 
-### Frontend
+## Frontend Stack
 
-#### React
+**Language rule: JavaScript React only. Do not introduce TypeScript.**
 
-| | |
-|---|---|
-| **What** | UI library |
-| **Why** | Dominant admin SPA ecosystem |
-| **Laravel eq.** | Blade / Inertia / Livewire (different model) — closest: Vue/React SPA with Laravel API |
-| **Where** | `frontend/` |
+| Library | What | Why | Laravel / prior mental model | Where |
+|---------|------|-----|------------------------------|-------|
+| **React** | UI library | Dominant admin SPA approach | Inertia/Vue/React SPA against Laravel API | `frontend/src` |
+| **Vite** | Dev server + bundler | Fast HMR, simple React setup | Laravel Vite plugin | `frontend/` |
+| **Tailwind CSS** | Utility CSS | Speed + Shadcn fit | Breeze / Jetstream Tailwind | Styles |
+| **Shadcn UI** | Copy-in UI primitives | Accessible admin components without lock-in | Filament / custom components | `components/ui` |
+| **React Router** | Client routing | Auth layouts, protected pages | `routes/web.php` vs SPA router | App shell |
+| **TanStack Query** | Server-state fetch/cache | Lists, cache, retries, loading states | “Smart client for API lists” | Data hooks |
+| **React Hook Form** | Form state | Less pain on CRUD forms | SPA form libs | Create/edit flows |
+| **Zod** | Schema validation (JS) | Client validation + parse API shapes | Form Request rules (client twin) | Form schemas, parsers |
 
-#### TypeScript
+> Zod works with JavaScript. Use JSDoc for editor hints if desired — still **not** TypeScript.
 
-| | |
-|---|---|
-| **What** | Typed JavaScript |
-| **Why** | Align FE contracts with Pydantic schemas |
-| **Laravel eq.** | PHP types / Form Request rules (server-side) |
-| **Where** | All frontend source |
-
-#### Vite
-
-| | |
-|---|---|
-| **What** | Frontend build tool / dev server |
-| **Why** | Fast HMR, simple React setup |
-| **Laravel eq.** | Vite via Laravel (`laravel-vite-plugin`) |
-| **Where** | `frontend/` |
-
-#### Tailwind CSS
-
-| | |
-|---|---|
-| **What** | Utility-first CSS |
-| **Why** | Speed + consistency with Shadcn |
-| **Laravel eq.** | Tailwind in Laravel Breeze/Jetstream |
-| **Where** | Component styles |
-
-#### Shadcn UI
-
-| | |
-|---|---|
-| **What** | Copy-in accessible component primitives (Radix + Tailwind) |
-| **Why** | Production admin look without a heavy UI kit lock-in |
-| **Laravel eq.** | No single equivalent; Filament / custom Blade components |
-| **Where** | `frontend/src/components/ui/` |
-
-#### React Router
-
-| | |
-|---|---|
-| **What** | Client-side routing |
-| **Why** | Protected admin routes, nested layouts |
-| **Laravel eq.** | `routes/web.php` (server) vs SPA router |
-| **Where** | App shell, auth gates |
-
-#### TanStack Query
-
-| | |
-|---|---|
-| **What** | Server-state cache / fetch library |
-| **Why** | Caching, retries, loading/error states for API data |
-| **Laravel eq.** | Livewire reactivity / Inertia partial reloads (different) — mental model: “smart HTTP client for lists” |
-| **Where** | Data hooks for products, users, dashboard |
-
-#### React Hook Form
-
-| | |
-|---|---|
-| **What** | Performant form state |
-| **Why** | Less re-render pain on admin forms |
-| **Laravel eq.** | Form + validation on server; FE form libs if SPA |
-| **Where** | Create/edit modals and pages |
-
-#### Zod
-
-| | |
-|---|---|
-| **What** | Schema validation for TypeScript |
-| **Why** | Client validation mirroring Pydantic; parse API shapes |
-| **Laravel eq.** | Form Request rules (client-side twin) |
-| **Where** | Form schemas, API response parsing |
-
----
-
-## Architecture
-
-### Style: Modular Monolith
-
-One codebase, one deployable API, **modules** with clear ownership:
-
-```
-backend/
-├── app/
-│   ├── main.py                 # ASGI entry / app factory
-│   ├── core/                   # Cross-cutting: config, db, security, logging
-│   ├── modules/                # Feature modules (auth, users, products, ...)
-│   │   ├── auth/
-│   │   ├── users/
-│   │   ├── roles/
-│   │   ├── products/
-│   │   ├── categories/
-│   │   ├── posts/
-│   │   └── dashboard/
-│   └── shared/                 # Truly shared types, exceptions, utils
-├── alembic/                    # Migrations
-├── tests/
-├── pyproject.toml
-└── README.md                   # This document (repo root or mirrored)
-```
-
-Frontend lives beside backend:
-
-```
-frontend/                       # React + Vite admin
-```
-
-### Folder meanings
-
-| Folder | Responsibility | Rule |
-|--------|----------------|------|
-| **`core/`** | App-wide wiring: settings, engine/session, security primitives, middleware, logging | No product business rules |
-| **`modules/<name>/`** | One feature area: router, schemas, service, repository, models (or model package) | Module owns its use cases |
-| **`shared/`** | Exceptions, base schemas, pagination helpers used by many modules | Keep thin — not a junk drawer |
-| **`tests/`** | Unit + API tests | Mirror module structure |
-
-### Typical module layout
-
-```
-modules/products/
-├── router.py          # HTTP endpoints (thin)
-├── schemas.py         # Pydantic in/out
-├── service.py         # Business rules
-├── repository.py      # DB queries only
-├── models.py          # SQLAlchemy models
-└── dependencies.py    # Module-specific Depends
-```
-
-### Request flow
-
-```
-HTTP Request
-    → Router (validate input via schema, auth deps)
-        → Service (business rules, orchestration)
-            → Repository (SQLAlchemy queries)
-                → PostgreSQL
-        ← Service (domain result)
-    ← Router (map to response schema)
-HTTP Response
-```
-
-| Layer | May do | Must not do |
-|-------|--------|-------------|
-| **Router** | Parse HTTP, call service, return schema | Business rules, raw SQL |
-| **Service** | Rules, transactions orchestration, call repos / other services | Scatter SQLAlchemy query details |
-| **Repository** | Queries, persistence | HTTP awareness, auth policy decisions |
-| **Schema** | Validate / serialize | Hit the database |
-
-### Why modular monolith (not microservices)
-
-| Need | Modular monolith | Microservices |
-|------|------------------|---------------|
-| Learn FastAPI deeply | Excellent | Distracts with ops |
-| Small / medium SaaS | Excellent | Overkill |
-| Clear boundaries | Modules | Network boundaries |
-| Future extract | Possible per module | Already split |
-| Local DX | One `uv run` | Many services |
-
-Suitable for: **small SaaS**, **medium apps**, **later scaling by extracting hot modules**.
-
-### Dependency Injection (mental model)
-
-Laravel: container resolves controller constructor / method injection.
-
-FastAPI: `Depends()` builds a call graph per request.
+### Frontend target tree (high level)
 
 ```text
-get_db() → Session
-get_current_user(token, db) → User
-require_permission("products.update")(user) → User or 403
-product_service(db) → ProductService
+frontend/
+├── src/
+│   ├── app/                 # shell, router
+│   ├── features/            # auth, users, products, posts, dashboard
+│   ├── components/          # shared + shadcn ui
+│   ├── lib/                 # api client, auth storage
+│   └── main.jsx
+├── index.html
+├── package.json
+└── vite.config.js
 ```
-
-No service provider classes required for basic wiring. Prefer functions and small factories over a custom IoC framework.
 
 ---
 
 ## Laravel → FastAPI Translation
 
-| Laravel concept | FastAPI / Python equivalent |
-|-----------------|----------------------------|
-| Controller | Router functions / APIRouter |
-| `routes/api.php` | `APIRouter` + `include_router` |
-| Form Request | Pydantic request schema (`BaseModel`) |
-| API Resource / JsonResource | Pydantic response schema |
-| Eloquent Model | SQLAlchemy `Mapped` model |
-| Service class | Service module / class |
-| Policy | Permission checks + policy functions/classes |
-| Gate | Dependency or helper: `require_permission("…")` |
-| Middleware | Middleware / dependencies / ASGI middleware |
-| Service Provider | App factory + lifespan hooks (`lifespan`) |
-| IoC Container | FastAPI DI (`Depends`) + explicit constructors |
-| Method / ctor injection | `Depends` parameters |
-| Job | ARQ / Celery task |
-| Event | Custom event dispatch (or library) |
-| Listener | Handler subscribed to event |
-| `config/*.php` + `.env` | `pydantic-settings` Settings class |
-| Migrations | Alembic revisions |
-| Queues (`ShouldQueue`) | Redis + ARQ/Celery |
-| Facades | Direct imports (no facades) |
-| Eloquent scopes | Repository methods / SQLAlchemy query helpers |
-| `artisan` | `uv run`, Alembic CLI, custom scripts |
-| `phpunit.xml` / Pest | `pytest` + `conftest.py` |
-| Policies in `AuthServiceProvider` | Register checks in deps or a small authz module |
-
-### Side-by-side intuition
-
-**Laravel**
-
-```php
-Route::post('/products', [ProductController::class, 'store']);
-// FormRequest validates → Controller → Service → Eloquent
-```
-
-**FastAPI**
-
-```python
-@router.post("/products", response_model=ProductRead)
-async def create_product(
-    payload: ProductCreate,
-    service: ProductService = Depends(get_product_service),
-    _: User = Depends(require_permission("products.create")),
-):
-    return await service.create(payload)
-```
-
-Same story: validate → authorize → service → persistence. Different wiring.
-
----
-
-## Folder Structure Evolution
-
-We **do not** start with the full modular tree. Complexity is earned.
-
-### Stage A — Simple FastAPI app
-
-```
-backend/
-├── main.py
-├── requirements or pyproject.toml
-└── .env
-```
-
-**Why:** Learn app factory, routing, OpenAPI, settings. Zero ceremony.
-
-### Stage B — Routers + services
-
-```
-backend/app/
-├── main.py
-├── core/config.py
-├── routers/
-├── services/
-└── schemas/
-```
-
-**Why:** Separate HTTP from business logic. Still one “domain pile”.
-
-### Stage C — Repositories + DB
-
-```
-... + models/, repositories/, alembic/
-```
-
-**Why:** Queries leave services; migrations exist.
-
-### Stage D — Modular monolith
-
-```
-app/modules/{auth,users,products,...}/
-app/core/
-app/shared/
-```
-
-**Why:** Features grow; modules prevent a god-folder. Extract only when pain appears.
-
-### Why not start at Stage D?
-
-| Starting complex | Cost |
-|------------------|------|
-| Empty module scaffolding | Ceremony without understanding |
-| Abstractions before use cases | Wrong boundaries |
-| “Enterprise” folders | Fear of deleting code you never needed |
-
-**Rule:** Promote structure when a folder hurts — not when a blog post says so.
+| Laravel | FastShop / FastAPI |
+|---------|-------------------|
+| Controller | Module `router.py` |
+| `routes/api.php` | `routes/api.py` + module routers |
+| Form Request | Pydantic `schemas.py` |
+| API Resource | Pydantic response schema |
+| Eloquent Model | SQLAlchemy `models.py` |
+| Service class | `service.py` |
+| Repository | `repository.py` |
+| Policy | `policies.py` |
+| Gate | Permission dependency / policy helpers |
+| Middleware | `app/middleware/` + dependencies |
+| Service Provider | `app/providers/` + lifespan / factory |
+| IoC Container | `Depends()` + explicit constructors |
+| Job | ARQ task |
+| Event / Listener | `events.py` + listeners |
+| `config/*.php` + `.env` | `config/` + pydantic-settings |
+| Migrations | Alembic under `database/migrations/` |
+| Seeders | `database/seeders/` |
+| `storage/` / `public/` | Same roles |
+| Facades | Direct imports |
+| Sanctum / JWT package | pwdlib + PyJWT |
+| Policies in AuthServiceProvider | Import and use policies in deps / router |
 
 ---
 
 ## Database Design
 
-Initial entities (admin-focused; not a full storefront checkout).
+Initial admin-domain entities:
 
-### ER overview
+| Entity | Notes |
+|--------|--------|
+| **users** | email, password_hash, profile fields, is_active |
+| **roles** | name, description |
+| **permissions** | code (`products.create`), description |
+| **role_user** | pivot User ↔ Role |
+| **permission_role** | pivot Role ↔ Permission |
+| **categories** | for products (and optionally posts) |
+| **products** | belongs to category; price, stock, image path |
+| **posts** | belongs to author; draft/published |
+| **audit_logs** (optional later) | actor, action, entity, metadata |
+
+### Relationships
 
 ```text
 users ←→ roles ←→ permissions
-  │
-  └── audit_logs
-
+users 1──* posts
 categories 1──* products
-
-posts (author → users)
 ```
-
-### Entities
-
-#### users
-
-| Column | Notes |
-|--------|-------|
-| id | PK |
-| email | Unique |
-| password_hash | Argon2 |
-| full_name | |
-| is_active | Soft disable |
-| created_at / updated_at | |
-
-#### roles
-
-| Column | Notes |
-|--------|-------|
-| id | PK |
-| name | Unique (`admin`, `editor`, …) |
-| description | |
-
-#### permissions
-
-| Column | Notes |
-|--------|-------|
-| id | PK |
-| code | Unique string (`products.create`) |
-| description | |
-
-#### role_user (pivot)
-
-Many-to-many: **User belongs to many Roles**.
-
-#### permission_role (pivot)
-
-Many-to-many: **Role has many Permissions**.
-
-#### categories
-
-| Column | Notes |
-|--------|-------|
-| id | PK |
-| name | |
-| slug | Unique |
-| parent_id | Optional self-FK for trees (keep flat in v1 if preferred) |
-
-#### products
-
-| Column | Notes |
-|--------|-------|
-| id | PK |
-| category_id | FK → categories |
-| name | |
-| slug | Unique |
-| description | |
-| price | Numeric |
-| stock | Int |
-| is_active | |
-| created_at / updated_at | |
-
-**Product belongs to Category.**
-
-#### posts
-
-| Column | Notes |
-|--------|-------|
-| id | PK |
-| author_id | FK → users |
-| title | |
-| slug | Unique |
-| body | |
-| status | draft / published |
-| published_at | Nullable |
-| created_at / updated_at | |
-
-**Post belongs to User (author).**
-
-#### audit_logs
-
-| Column | Notes |
-|--------|-------|
-| id | PK |
-| actor_id | FK → users (nullable for system) |
-| action | e.g. `product.updated` |
-| entity_type / entity_id | Polymorphic-ish reference |
-| metadata | JSON |
-| created_at | |
-
-### Relationship summary
 
 | Relationship | Type |
 |--------------|------|
@@ -664,661 +524,963 @@ Many-to-many: **Role has many Permissions**.
 | Role ↔ Permission | Many-to-many |
 | Category → Product | One-to-many |
 | User → Post | One-to-many |
-| User → AuditLog | One-to-many |
 
-Laravel mental model: Eloquent `belongsToMany`, `hasMany`, `belongsTo` map 1:1 to SQLAlchemy relationships — syntax differs; cardinality same.
+Laravel: same cardinality you know (`belongsToMany`, `hasMany`, `belongsTo`). SQLAlchemy expresses it differently; meaning is identical.
 
 ---
 
-## Development Roadmap
+## Coding Rules
 
-Each phase: **Goal → Concepts → Files → Libraries → Laravel comparison → Result**.
+1. **Business logic** → `service.py`
+2. **Database queries** → `repository.py`
+3. **HTTP logic** → `router.py`
+4. **Validation / serialization** → `schemas.py`
+5. **Configuration** → `config/`
+6. **Authorization rules** → `policies.py` (+ permission deps)
+7. Use **dependency injection** (`Depends`, constructors)
+8. Avoid **global mutable state**
+9. Prefer **simple solutions** over clever abstractions
+10. Avoid **premature abstraction** (no interface until a second implementation needs it)
+11. Write **readable Python**; prefer clarity over cleverness
+12. Use **type hints** on backend public functions
+13. Frontend stays **JavaScript** — no TypeScript creep
+14. After each phase, update the **Learning Log**
 
-Do phases in order. Tick Learning Notes after each.
+---
+
+## Feature-Based Development Roadmap
+
+Each phase includes: **Feature · Goal · Concepts · Packages · Files · Steps · Laravel comparison · Expected result**.
+
+Implement phases in order. One phase at a time.
 
 ---
 
 ### Phase 0 — Python Backend Preparation
 
-**Goal:** Gain Python mental models FastAPI assumes you already have.
+| | |
+|---|---|
+| **Feature** | Language foundations |
+| **Goal** | Python mental models FastAPI assumes |
 
 **Concepts learned**
 
-| Concept | Why it matters for FastAPI |
-|---------|----------------------------|
-| Decorators | `@app.get`, `@router.post`, middleware-style wrappers |
-| Functions as objects | Pass callables into `Depends` |
-| Type hints | Pydantic + OpenAPI + editor help |
-| async / await | Concurrent I/O endpoints |
-| Generators | Streaming, some resource patterns |
-| Context managers | DB sessions, `with` resources |
-| Dataclasses | Simple structured data (alongside Pydantic) |
-| Protocols | Structural typing (“duck interfaces”) without heavy ABC trees |
+- Decorators
+- Functions as objects
+- Type hints
+- Classes
+- Dataclasses
+- async / await
+- Generators
+- Context managers
+
+**Packages installed**
+
+- None required (stdlib). Optional: scratch scripts only.
 
 **Files created**
 
-- Optional: `learning/phase0/` scratch notebooks or scripts (not production code)
+```text
+learning/phase0/     # optional scratch — not production app
+```
 
-**Libraries used**
+**Implementation steps**
 
-- Stdlib only (+ maybe `mypy` later)
+1. Practice decorators wrapping functions (log call, time call).
+2. Pass functions as arguments (preview of `Depends`).
+3. Annotate functions with type hints; read errors intentionally.
+4. Write a small class + dataclass; compare.
+5. Write async sleep + gather toy examples.
+6. Write a generator and a `with` context manager (resource open/close).
 
 **Laravel comparison**
 
-- Decorators ≈ attributes / middleware wrappers, but more central in Python
-- Type hints ≈ PHP types + docblocks, but runtime-validated via Pydantic
-- async ≈ rarely first-class in classic Laravel request cycle (Octane/Swoole aside)
+| Laravel / PHP | Python focus |
+|---------------|--------------|
+| Attributes / middleware wrappers | Decorators are everyday |
+| Typed properties / params | Type hints + (later) Pydantic runtime |
+| Rare first-class async request cycle | async is normal for FastAPI I/O |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Core Python, no FastAPI |
+| **Why?** | Without this, FastAPI looks like magic |
+| **How?** | Short deliberate exercises |
+| **Common mistakes?** | Jumping to FastAPI tutorials and memorizing snippets |
 
 **Expected result**
 
-You can read FastAPI source examples without panic. You know what `Depends(get_db)` *is* (a callable).
+You can explain what a decorator is and why `Depends(fn)` works (callable injection).
 
 ---
 
 ### Phase 1 — Project Foundation
 
-**Goal:** Runnable FastAPI app with typed settings and clean tooling.
+| | |
+|---|---|
+| **Feature** | Application bootstrap |
+| **Goal** | Running FastAPI app with config and structure |
 
 **Concepts learned**
 
-- `uv` projects and lockfiles
-- Ruff lint/format
-- Environment variables + `.env`
+- uv project / lockfile
+- Application factory
+- Environment files
 - pydantic-settings
-- Application factory / lifespan
-- Configuration as a typed object
+- Logging basics
+- Laravel-like folder map in Python
 
-**Files created (target)**
+**Packages installed**
 
+```text
+fastapi
+uvicorn
+pydantic-settings
 ```
+
+(Dev: `ruff`, project via `uv`)
+
+**Files created**
+
+```text
 backend/
-├── pyproject.toml
-├── .env.example
-├── app/
-│   ├── __init__.py
-│   ├── main.py
-│   └── core/
-│       └── config.py
-└── README.md (link to this roadmap)
+  app/main.py
+  app/providers/
+  app/middleware/          # may be empty stubs
+  app/exceptions/
+  app/helpers/
+  config/settings.py
+  routes/api.py
+  routes/web.py
+  .env.example
+  pyproject.toml
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- FastAPI, Uvicorn (or Hypercorn), pydantic-settings, Ruff, uv
+1. Init project with `uv`; add FastAPI, Uvicorn, pydantic-settings.
+2. Create Laravel-inspired folders (empty modules OK).
+3. Implement `Settings` from env.
+4. Implement `create_app()` / `main.py` factory.
+5. Register a `/health` route via `routes/web.py` or `api.py`.
+6. Configure basic logging.
+7. Run OpenAPI docs (`/docs`).
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
-| `composer create-project` | `uv init` + deps |
-| `.env` + `config/app.php` | `.env` + `Settings` |
-| `bootstrap/app.php` | `create_app()` / `main.py` |
+| `bootstrap/app.php` | `app/main.py` factory |
+| Service providers | `app/providers/` |
+| `config/*.php` + `.env` | `config/settings.py` |
+| `artisan serve` | `uv run uvicorn ...` |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Bootable skeleton |
+| **Why?** | Every later phase mounts onto this |
+| **How?** | Factory + settings + one health route |
+| **Common mistakes?** | Dumping everything in one `main.py` forever; hardcoding secrets |
 
 **Expected result**
 
-`GET /health` returns OK. Settings load from env. `ruff check` passes. OpenAPI at `/docs`.
+Running FastAPI application. `/health` OK. Settings load from `.env`.
 
 ---
 
-### Phase 2 — Database Layer
+### Phase 2 — Database Foundation
 
-**Goal:** PostgreSQL connected; models and migrations work.
+| | |
+|---|---|
+| **Feature** | Database system |
+| **Goal** | PostgreSQL + SQLAlchemy + Alembic ready |
 
 **Concepts learned**
 
-- SQLAlchemy 2.0 `Mapped` / `mapped_column`
-- Engine + session lifecycle
+- SQLAlchemy 2 engine / session
+- Base model + timestamps
 - Alembic revision workflow
-- Sync vs async SQLAlchemy (choose one path and stick to it for learning clarity)
+- Connection dependency `get_db`
+
+**Packages installed**
+
+```text
+sqlalchemy
+psycopg
+alembic
+```
 
 **Files created**
 
-```
-app/core/database.py
-app/modules/.../models.py   # or app/models/ early, then move
-alembic.ini
-alembic/env.py
-alembic/versions/*.py
+```text
+backend/
+  config/database.py
+  database/connection.py
+  database/migrations/     # Alembic versions
+  database/seeders/
+  # shared DeclarativeBase (location you choose under database/ or app/)
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- SQLAlchemy 2.0, asyncpg or psycopg, Alembic, PostgreSQL
+1. Add Postgres to local Docker or host; set `DATABASE_URL`.
+2. Configure engine + session factory in `database/connection.py`.
+3. Create Declarative `Base` with timestamp mixin.
+4. Init Alembic; point metadata at Base.
+5. Create first migration (empty or baseline).
+6. Wire `get_db` dependency for later routers.
+7. Document sync vs async choice for this project (pick one learning path).
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
-| Eloquent model | SQLAlchemy model |
+| Eloquent model base | SQLAlchemy `Base` |
 | `artisan migrate` | `alembic upgrade head` |
-| DB facade / Eloquent | `Session` / repository |
+| `database/migrations` | `database/migrations/` |
+| DB facade | `Session` via `Depends` |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Persistence backbone |
+| **Why?** | Auth and modules need real tables |
+| **How?** | Engine → session → Alembic |
+| **Common mistakes?** | Long-lived global sessions; mixing raw SQL in routers |
 
 **Expected result**
 
-Migration creates empty tables (or first tables). App obtains a session per request via `Depends`.
+Database ready. Migrations apply. App can obtain a session per request.
 
 ---
 
-### Phase 3 — Basic Architecture
+### Phase 3 — Authentication
 
-**Goal:** Establish Router → Service → Repository → Database.
+| | |
+|---|---|
+| **Feature** | User authentication |
+| **Goal** | Complete auth system (register, login, JWT, current user) |
 
 **Concepts learned**
 
-- APIRouter composition
-- Service layer
-- Repository pattern (pragmatic, not enterprise theater)
-- Pydantic schemas (create / update / read)
-- Dependency injection with `Depends`
+- Argon2 hashing via pwdlib
+- JWT create/verify via PyJWT
+- FastAPI `Depends()` chains
+- Bearer auth for SPA
+
+**Packages installed**
+
+```text
+pwdlib[argon2]
+pyjwt
+```
 
 **Files created**
 
-```
-app/modules/example/   # or products skeleton
+```text
+modules/auth/
   router.py
-  schemas.py
   service.py
   repository.py
-  dependencies.py
-app/main.py            # include routers
-```
-
-**Libraries used**
-
-- FastAPI, Pydantic, SQLAlchemy (existing)
-
-**Laravel comparison**
-
-| Layer | Laravel | FastAPI |
-|-------|---------|---------|
-| HTTP | Controller | Router |
-| Rules | Action / Service | Service |
-| DB | Eloquent in model/repo | Repository |
-| Input | Form Request | Schema |
-| Wiring | Container | `Depends` |
-
-**Expected result**
-
-One vertical slice (e.g. list/create resource) proves the layering. No business logic in routers. No SQL in services.
-
----
-
-### Phase 4 — Authentication
-
-**Goal:** Register / login with Argon2 + JWT; protect routes.
-
-**Concepts learned**
-
-- Password hashing with **pwdlib** (Argon2)
-- JWT create / verify with **PyJWT**
-- `OAuth2PasswordBearer` or custom bearer dependency
-- `get_current_user` dependency chain
-- Safe error messages (no user enumeration if desired)
-
-**Files created**
-
-```
-app/modules/auth/
-  router.py
   schemas.py
-  service.py
-  dependencies.py
-app/modules/users/models.py
-app/core/security.py
+  policies.py          # may be thin at first
+  events.py            # e.g. UserRegistered (optional stub)
+modules/users/models.py
+config/security.py
+database/migrations/*_users.py
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- pwdlib[argon2], PyJWT, FastAPI security utilities
+1. Users table migration (email unique, password_hash, …).
+2. Auth schemas: register, login, token response, user read.
+3. Hash passwords with pwdlib Argon2.
+4. Issue JWT on login; verify in `get_current_user`.
+5. Routes: register, login, `GET /me`.
+6. Protect a sample route with `Depends(get_current_user)`.
+7. Register auth router in `routes/api.py`.
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
 | `Hash::make` | pwdlib Argon2 |
-| Sanctum / Passport / JWT | PyJWT access tokens |
+| Sanctum / JWT | PyJWT access tokens |
 | `auth` middleware | `Depends(get_current_user)` |
-| `RegisterController` | `auth/router.py` |
+| `RegisterController` / Fortify | `modules/auth/router.py` |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Identity for the API |
+| **Why?** | All admin features need a user |
+| **How?** | Hash → JWT → Depends |
+| **Common mistakes?** | Storing plaintext; putting JWT secret in code; fat auth router with SQL |
 
 **Expected result**
 
-Register + login return tokens. Protected route rejects missing/invalid JWT. Password never stored plaintext.
-
-**Explain focus**
-
-- **pwdlib** — hashing API; Argon2 parameters matter
-- **PyJWT** — claims (`sub`, `exp`), signing secret, algorithms
-- **Depends()** — composes auth into any endpoint
+Complete authentication system. Register/login work. `/me` returns current user.
 
 ---
 
-### Phase 5 — Authorization
+### Phase 4 — Authorization
 
-**Goal:** Roles, permissions, policy-style checks.
+| | |
+|---|---|
+| **Feature** | Roles and permissions |
+| **Goal** | Protected resources via RBAC + policies |
 
 **Concepts learned**
 
-- RBAC tables and seeding
-- Permission codes as strings
-- Reusable `require_permission("…")` dependencies
-- Optional policy classes for complex rules (ownership, etc.)
+- Roles / permissions tables
+- Permission dependencies
+- Policy functions/classes
+- Laravel Gate/Policy mapping
+
+**Packages installed**
+
+- None new (use existing stack)
 
 **Files created**
 
-```
-app/modules/roles/
-app/modules/users/  # assign roles
-app/core/authz.py   # or modules/auth/policies.py
-seeds / fixtures for admin role
+```text
+modules/roles/
+modules/permissions/
+modules/users/          # assign roles
+*/policies.py
+database/seeders/rbac.py
+database/migrations/*_rbac.py
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- Existing stack (no Gate package required)
+1. Migrations: roles, permissions, pivots.
+2. Seed admin role + baseline permissions (`users.view`, `products.create`, …).
+3. Implement `require_permission("…")` dependency.
+4. Implement module `policies.py` for object-level rules when needed.
+5. Attach checks to sample protected routes.
+6. Ensure 403 vs 401 distinction.
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
-| Gate::define | permission helper / dep |
-| Policy class | policy functions/classes |
-| `$this->authorize` | `Depends(require_permission(...))` |
-| spatie/permission | Your RBAC tables (learn by building) |
+| Gate | Permission dependency helpers |
+| Policy class | `policies.py` |
+| `$this->authorize()` | `Depends(require_permission(...))` / policy call |
+| spatie/permission | Built yourself for learning |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Who can do what |
+| **Why?** | Admin panel without authz is insecure theater |
+| **How?** | RBAC tables + Depends + policies |
+| **Common mistakes?** | Checking roles only (`if admin`) forever; forgetting seed permissions |
 
 **Expected result**
 
-Admin can manage products; role without permission gets 403. Permission check is one line at the endpoint.
+Protected resources. Missing permission → 403.
+
+---
+
+### Phase 5 — Users Module
+
+| | |
+|---|---|
+| **Feature** | User management |
+| **Goal** | Admin user CRUD with list UX |
+
+**Concepts learned**
+
+- REST API design
+- Pagination, filtering, searching, sorting
+- Full module vertical slice
+
+**Packages installed**
+
+- None new
+
+**Files created**
+
+```text
+modules/users/
+  router.py
+  service.py
+  repository.py
+  models.py
+  schemas.py
+  policies.py
+  events.py
+```
+
+**Implementation steps**
+
+1. List users with page/size, search (email/name), sort.
+2. Create / update / soft-disable user.
+3. Assign roles (if ready).
+4. Enforce permissions (`users.view`, `users.update`, …).
+5. Tests for happy path + forbidden.
+
+**Laravel comparison**
+
+| Laravel | FastShop |
+|---------|----------|
+| UserController + FormRequest | users router + schemas |
+| Query filters / Spatie Query Builder | repository query composition |
+| API Resource | response schema |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Admin user management API |
+| **Why?** | Practice list patterns before products |
+| **How?** | Router → service → repository with query params |
+| **Common mistakes?** | N+1 role loading; allowing user to escalate own roles without policy |
+
+**Expected result**
+
+Admin user management API complete.
 
 ---
 
 ### Phase 6 — Products Module
 
-**Goal:** Full CRUD with real list UX needs.
+| | |
+|---|---|
+| **Feature** | Product management |
+| **Goal** | Inventory management (categories + products + images) |
 
 **Concepts learned**
 
-- Pagination (limit/offset or cursor — pick one, document why)
-- Filtering, searching, sorting
-- Validation edge cases (price, slug uniqueness)
-- Response schemas as API resources
-- Category relationship on product
+- Nested resources / FKs
+- File upload to `storage/`
+- Rich filtering
+
+**Packages installed**
+
+- None required initially (stdlib + FastAPI `UploadFile`)
 
 **Files created**
 
-```
-app/modules/products/*
-app/modules/categories/*   # at least enough for FK
+```text
+modules/categories/
+modules/products/
+storage/app/products/    # or similar
+database/migrations/*_catalog.py
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- FastAPI Query params, Pydantic, SQLAlchemy
+1. Categories CRUD.
+2. Products CRUD with `category_id`.
+3. Image upload endpoint; store under `storage/`; serve safely.
+4. Filters: category, price range, active flag; search name; sort; paginate.
+5. Permissions on mutating routes.
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
-| `ProductController` | `products/router.py` |
-| Spatie Query Builder / manual | Repository query composition |
-| API Resource | `ProductRead` schema |
-| Form Request | `ProductCreate` / `ProductUpdate` |
+| ProductController + stores disk | products module + `storage/` |
+| `$request->file()` | `UploadFile` |
+| Eloquent relationships | SQLAlchemy relationships |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Catalog admin API |
+| **Why?** | Core domain of FastShop |
+| **How?** | Categories first, then products + upload |
+| **Common mistakes?** | Trusting client filenames; storing images in git; SQL in router |
 
 **Expected result**
 
-Admin can create/list/update/delete products with filter/search/sort/page. OpenAPI documents query params.
+Complete inventory management backend.
 
 ---
 
-### Phase 7 — Admin Dashboard
+### Phase 7 — Posts Module
 
-**Goal:** Aggregation endpoints for UI charts/cards.
+| | |
+|---|---|
+| **Feature** | CMS |
+| **Goal** | Simple content management |
 
 **Concepts learned**
 
-- `func.count`, `group_by`, date trunc
-- Read-only dashboard service
-- Avoid N+1; single purposeful queries
+- Draft vs published workflows
+- Author ownership policies
+- Reusing list/filter patterns
+
+**Packages installed**
+
+- None new
 
 **Files created**
 
+```text
+modules/posts/
+database/migrations/*_posts.py
 ```
-app/modules/dashboard/
+
+**Implementation steps**
+
+1. Posts table: title, slug, body, status, author_id, published_at.
+2. CRUD + publish/unpublish actions.
+3. Policy: author or admin can edit (decide and document).
+4. Optional: post categories if useful (keep simple).
+
+**Laravel comparison**
+
+| Laravel | FastShop |
+|---------|----------|
+| PostPolicy | `posts/policies.py` |
+| Eloquent scopes (`published()`) | repository methods |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Simple CMS API |
+| **Why?** | Second domain module; proves modularity |
+| **How?** | Same module template as users/products |
+| **Common mistakes?** | Duplicating product list code instead of tiny shared helpers |
+
+**Expected result**
+
+Simple CMS backend.
+
+---
+
+### Phase 8 — Dashboard
+
+| | |
+|---|---|
+| **Feature** | Admin dashboard |
+| **Goal** | Statistics + charts API |
+
+**Concepts learned**
+
+- Aggregation queries (`count`, `group_by`)
+- Read-only dashboard service
+- Payload shape for charts
+
+**Packages installed**
+
+- None new
+
+**Files created**
+
+```text
+modules/dashboard/
   router.py
-  schemas.py
   service.py
   repository.py
+  schemas.py
+  policies.py
+  events.py            # often unused — OK
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- SQLAlchemy aggregation
+1. Totals: users, products, posts, published vs draft.
+2. Groupings: products per category.
+3. Recent activity endpoints (or last N products/posts).
+4. Permission: `dashboard.view`.
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
-| Dashboard controller + query | dashboard module |
+| Dashboard controller + aggregates | dashboard module |
 | `DB::raw` / Eloquent aggregates | SQLAlchemy `func` |
 
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Aggregation APIs for UI |
+| **Why?** | Admin home needs summary data |
+| **How?** | Few purposeful SQL aggregations |
+| **Common mistakes?** | Multiple chatty endpoints when one summary DTO would do |
+
 **Expected result**
 
-Endpoints like totals (users, products, posts), products per category, recent activity — ready for React cards.
+Admin dashboard APIs ready for React charts/cards.
 
 ---
 
-### Phase 8 — Frontend
+### Phase 9 — React Admin Panel
 
-**Goal:** React admin that consumes the API.
+| | |
+|---|---|
+| **Feature** | Frontend application |
+| **Goal** | Complete JS React admin panel |
 
 **Concepts learned**
 
-- Vite + React + TS project layout
+- Vite + React (JavaScript)
+- Tailwind + Shadcn
 - Auth storage + protected routes
-- TanStack Query for lists
-- RHF + Zod for forms
-- Shadcn tables, dialogs, forms
+- TanStack Query + forms + dialogs
+
+**Packages installed** (frontend)
+
+```text
+react
+react-dom
+react-router-dom
+@tanstack/react-query
+react-hook-form
+zod
+tailwindcss
+# shadcn components added via CLI (JS)
+```
 
 **Files created**
 
-```
+```text
 frontend/
-  src/pages/
-  src/components/
-  src/features/auth|products|dashboard/
-  src/lib/api.ts
+  src/main.jsx
+  src/app/...
+  src/features/auth|users|products|posts|dashboard/
+  src/components/ui/...
+  src/lib/api.js
+  vite.config.js
+  package.json
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- React, TypeScript, Vite, Tailwind, Shadcn UI, React Router, TanStack Query, React Hook Form, Zod
+1. Scaffold Vite React **JavaScript** template (not TS).
+2. Tailwind + Shadcn setup.
+3. API client with JWT header.
+4. Login page → store token → protected layout.
+5. Dashboard cards from Phase 8 APIs.
+6. Tables for users/products/posts.
+7. Forms + dialogs for create/edit.
+8. Logout + 401 handling.
 
 **Laravel comparison**
 
-Closest: **Laravel API + separate SPA** (not Blade). Auth feels like Sanctum SPA or token Bearer headers.
+Closest: **Laravel API + separate SPA**. Not Blade. Auth feels like token Bearer SPA.
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Full admin UI in JS |
+| **Why?** | Prove API real-world usability |
+| **How?** | Feature folders matching backend modules |
+| **Common mistakes?** | Accidentally scaffolding TypeScript; putting business rules only in UI; ignoring 403 UX |
 
 **Expected result**
 
-Login → dashboard → products table → create/edit modal → logout. Unauthorized users redirected.
+Complete admin panel: auth, dashboard, tables, forms, dialogs.
 
 ---
 
-### Phase 9 — Advanced Backend
+### Phase 10 — Advanced Backend
 
-**Goal:** Production cross-cutting concerns + async work.
+| | |
+|---|---|
+| **Feature** | Middleware · Events · Queues |
+| **Goal** | Production backend cross-cutting concepts |
 
 **Concepts learned**
 
-- Middleware (request ID, timing)
-- Structured logging
-- Exception handlers → consistent error JSON
-- Domain events + listeners (start simple)
-- Redis
-- Background jobs (ARQ or Celery)
-- Audit log writes
+- Request logging middleware
+- Global exception handling
+- CORS for React origin
+- Domain events + listeners
+- Redis + ARQ background jobs
+
+**Packages installed**
+
+```text
+redis
+arq
+httpx          # if not already (tests / clients)
+```
 
 **Files created**
 
-```
-app/core/logging.py
-app/core/exceptions.py
-app/core/middleware.py
-app/core/events.py
-app/core/queue/
-app/modules/.../jobs.py
+```text
+app/middleware/request_logging.py
+app/exceptions/handlers.py
+config/security.py          # CORS settings expanded
+modules/*/events.py         # real events
+# listeners package or app/listeners/
+# ARQ worker settings
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- Redis, ARQ or Celery, logging libs as needed
+1. Middleware: request id + timing logs.
+2. Map domain/validation errors to consistent JSON.
+3. Configure CORS for Vite origin.
+4. Emit event on meaningful actions (e.g. product created).
+5. Listener writes audit row or enqueues job.
+6. Run Redis; implement one ARQ job (email stub / thumbnail / stats rebuild).
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
-| Exception Handler | FastAPI exception handlers |
-| Middleware | Middleware / deps |
-| Event + Listener | Simple dispatcher |
-| `ShouldQueue` Job | ARQ/Celery task |
-| Log facade | `logging` / structlog |
+| Middleware | `app/middleware/` |
+| Exception Handler | FastAPI handlers |
+| Event + Listener | events + listeners |
+| Queue job | ARQ task |
+| `cors.php` | CORS middleware config |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Cross-cutting production plumbing |
+| **Why?** | Real apps need ops-friendly behavior |
+| **How?** | Middleware → errors → events → Redis/ARQ |
+| **Common mistakes?** | Logging secrets; sync heavy work in request; unbounded CORS `*` in prod |
 
 **Expected result**
 
-Failed validation and domain errors look consistent. A sample job (e.g. “recompute dashboard cache” or “send welcome email stub”) runs in worker. Redis up in Compose.
+Production backend concepts working: middleware, errors, events, queues.
 
 ---
 
-### Phase 10 — Production Preparation
+### Phase 11 — Production Quality
 
-**Goal:** Ship-ready habits.
+| | |
+|---|---|
+| **Feature** | Ship readiness |
+| **Goal** | Tests, Docker, CI/CD, security, optimization basics |
 
 **Concepts learned**
 
-- Multi-stage Docker builds
-- Compose for api + db + redis + worker + frontend
-- pytest strategy (unit vs API)
-- CI pipeline (lint, test, migrate check)
-- Security: secrets, CORS, rate limit, HTTPS assumptions
-- Deployment checklist
+- pytest API/unit strategy
+- Docker Compose multi-service
+- CI lint/test
+- Security checklist (secrets, headers, uploads)
+- Simple query/index optimization
+
+**Packages installed**
+
+- Test extras as needed (`pytest`, `httpx`, coverage optional)
 
 **Files created**
 
-```
+```text
 Dockerfile
 docker-compose.yml
-.github/workflows/ci.yml   # or GitLab CI
-tests/ ... expanded
-docs/deployment.md         # optional short checklist
+.github/workflows/ci.yml    # or equivalent
+tests/ expanded
 ```
 
-**Libraries used**
+**Implementation steps**
 
-- Docker, pytest, Ruff, CI provider
+1. Expand tests: auth, authz, one module CRUD.
+2. Dockerize API + Postgres + Redis + worker + frontend (or FE separate).
+3. CI: ruff + pytest on PR.
+4. Security pass: env secrets, upload validation, JWT settings, rate limit sketch.
+5. Add missing indexes for hot filters.
+6. Write short deploy checklist in Learning Log.
 
 **Laravel comparison**
 
 | Laravel | FastShop |
 |---------|----------|
-| Sail | Compose |
-| GitHub Actions + PHPUnit | CI + pytest |
-| `config/cors.php` | CORS middleware settings |
+| Sail | Docker Compose |
+| PHPUnit in CI | pytest in CI |
+| Horizon / queue workers | ARQ worker container |
+
+**What / Why / How / Mistakes**
+
+| | |
+|---|---|
+| **What?** | Production quality bar |
+| **Why?** | Learning ends when ship habits exist |
+| **How?** | Test → containerize → CI → harden |
+| **Common mistakes?** | CI without migrations check; baking `.env` into images |
 
 **Expected result**
 
-`docker compose up` runs the stack. CI red on lint/test fail. Documented deploy steps.
-
----
-
-## Coding Rules
-
-1. **Prefer readability over clever code** — junior-you in 6 months is the reviewer.
-2. **Use type hints** — everywhere public; especially function signatures.
-3. **Avoid unnecessary abstraction** — no interface until a second implementation appears.
-4. **Keep business logic out of routers** — routers are HTTP adapters.
-5. **Keep database queries out of services** — services call repositories.
-6. **Use dependency injection** — testable, explicit wiring.
-7. **Write tests** — at least for authz boundaries and critical services.
-8. **Follow SOLID where useful** — not as a religion; YAGNI still wins.
-9. **Avoid premature optimization** — measure first; indexes when queries hurt.
-10. **Name permissions like actions** — `products.create`, not `product_manager_flag`.
-11. **One module, one reason to change** — resist cross-import spaghetti; share via `shared/` sparingly.
-12. **Document decisions in Learning Notes** — especially Laravel ≠ FastAPI mismatches.
+Confident run path: tests green, Compose up, CI gating merges.
 
 ---
 
 ## Commands
 
-### Project / dependencies
+### Backend (uv)
 
 ```bash
-# Create / sync project (uv)
-uv init
-uv add fastapi uvicorn sqlalchemy alembic pydantic-settings ...
+uv sync
+uv add fastapi uvicorn pydantic-settings
+uv add sqlalchemy psycopg alembic
+uv add 'pwdlib[argon2]' pyjwt
+uv add redis arq httpx
 uv add --dev pytest ruff
 
-# Install from lockfile
-uv sync
-
-# Run a tool in the project env
 uv run uvicorn app.main:app --reload
 uv run pytest
 uv run ruff check .
 uv run ruff format .
 ```
 
-### Database
+### Migrations
 
 ```bash
-# Create revision (after model changes)
 uv run alembic revision --autogenerate -m "describe change"
-
-# Apply migrations
 uv run alembic upgrade head
-
-# Rollback one step
 uv run alembic downgrade -1
 ```
 
-### Testing & lint
+### Frontend (JavaScript)
 
 ```bash
-uv run pytest
-uv run pytest -k auth
-uv run ruff check .
-uv run ruff format .
+cd frontend
+npm create vite@latest . -- --template react   # JS template, NOT react-ts
+npm install
+npm install react-router-dom @tanstack/react-query react-hook-form zod
+npm run dev
+npm run build
 ```
 
-### Workers / Redis (Phase 9+)
+### Workers (Phase 10+)
 
 ```bash
-# Example shapes — exact commands depend on ARQ vs Celery choice
-uv run arq app.core.queue.WorkerSettings
-# or
-uv run celery -A app.core.queue worker -l info
+uv run arq app.core_or_queue.WorkerSettings   # adjust to real path when implemented
 ```
 
-### Docker (Phase 10)
+### Docker (Phase 11)
 
 ```bash
 docker compose up --build
 docker compose exec api uv run alembic upgrade head
 ```
 
-### Frontend (Phase 8+)
-
-```bash
-cd frontend
-npm install   # or pnpm / bun — pick one and stick to it
-npm run dev
-npm run build
-```
-
 ---
 
-## Learning Notes
+## Living Learning Log
 
-Use this section as a living journal. Duplicate a block per week/phase.
+The README evolves. After **each completed phase**, append an entry.
 
-### Template
+### Entry template
 
 ```markdown
-### Date / Phase: ____
+### Phase X — <name> — <date>
 
-#### New Python concepts
+#### Lessons learned
 -
 
-#### New libraries
-- name — what I thought it did vs what it actually does
-
-#### Architectural decisions
+#### Architecture decisions
 - Decision:
-- Alternatives considered:
-- Why we chose this:
+- Alternatives:
+- Why:
 
-#### Mistakes
-- What broke:
-- Root cause:
-- Fix / rule for future:
+#### New libraries
+- name — why it earned its place
 
-#### Laravel comparisons
-- Laravel way:
-- FastAPI way:
-- What clicked / what still feels weird:
+#### Problems solved
+- Symptom → cause → fix
+
+#### What / Why / How (phase recap)
+- What:
+- Why:
+- How:
+
+#### Laravel equivalent (what finally clicked)
+-
+
+#### Common mistakes I made
+-
 ```
 
 ### Log
 
-<!-- Append entries below. Do not delete old notes. -->
+<!-- Append below. Never delete old entries. -->
 
 #### Phase 0
 
-- 
+_Pending_
 
 #### Phase 1
 
-- 
+_Pending_
 
 #### Phase 2
 
-- 
+_Pending_
 
 #### Phase 3
 
-- 
+_Pending_
 
 #### Phase 4
 
-- 
+_Pending_
 
 #### Phase 5
 
-- 
+_Pending_
 
 #### Phase 6
 
-- 
+_Pending_
 
 #### Phase 7
 
-- 
+_Pending_
 
 #### Phase 8
 
-- 
+_Pending_
 
 #### Phase 9
 
-- 
+_Pending_
 
 #### Phase 10
 
-- 
+_Pending_
+
+#### Phase 11
+
+_Pending_
 
 ---
 
-## Definition of Done (whole project)
+## Definition of Done
 
-FastShop is “complete” as a learning milestone when:
+FastShop learning milestone complete when:
 
-- [ ] Modular monolith layout exists and is explained in your own words
+- [ ] Laravel-inspired backend tree exists and you can explain each folder
 - [ ] Auth (Argon2 + JWT) works
-- [ ] RBAC enforces permissions on products/admin routes
-- [ ] Products CRUD supports pagination, filter, search, sort
+- [ ] RBAC + policies protect resources
+- [ ] Users / Products / Posts modules follow router → service → repository
 - [ ] Dashboard aggregations exist
-- [ ] React admin covers login, dashboard, products
-- [ ] Errors/logging consistent; at least one background job
-- [ ] Docker Compose boots API + Postgres + Redis (+ worker)
-- [ ] pytest + Ruff run in CI
-- [ ] Learning Notes filled for every phase
+- [ ] React **JavaScript** admin works (auth, tables, forms, dialogs)
+- [ ] Middleware, exception shape, events, Redis + ARQ job exist
+- [ ] Tests + Docker + CI in place
+- [ ] Learning Log filled for every phase
 
 ---
 
-## How to continue from here
+## How to continue
 
-1. Start **Phase 0** — Python concepts (no FastAPI app required).
-2. Only then **Phase 1** — foundation.
-3. Resist generating the whole repo at once. Understanding > scaffolding.
-
-**Next agent/dev instruction when ready:** “Implement Phase 1 only, following README.”
+1. Start **Phase 0** (Python only — no FastAPI app required).
+2. Then **Phase 1** (foundation only).
+3. Tell the coding agent:  
+   `Implement Phase N only, following README. No TypeScript. No skipping explanations.`
 
 ---
 
