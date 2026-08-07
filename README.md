@@ -111,20 +111,23 @@ For **every** implementation step, document:
 One deployable backend. Features live in **modules**. Cross-cutting pieces live in familiar Laravel-shaped folders (`config/`, `routes/`, `database/`, `app/`).
 
 ```text
-FastShop/
-├── backend/
-│   ├── app/
-│   ├── config/
-│   ├── database/
-│   │   ├── migrations/
-│   │   └── seeders/
-│   ├── routes/
-│   ├── storage/
-│   ├── public/
-│   ├── modules/
-│   └── tests/
-└── frontend/          # React + JavaScript (no TypeScript)
+FastShop/                 # repo root (Python app lives here)
+├── app/
+├── config/
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── routes/
+├── storage/
+├── public/
+├── modules/
+├── tests/
+├── pyproject.toml
+├── README.md
+└── frontend/             # React + JavaScript (no TypeScript) — Phase 9
 ```
+
+Python package + Laravel-shaped folders sit at **repo root** (not under a nested `backend/` folder). Frontend is a sibling directory when added.
 
 ### Why this structure?
 
@@ -168,35 +171,35 @@ FastShop/
 
 ## Backend Structure
 
+All paths below are relative to the **repo root**.
+
 ```text
-backend/
-├── app/
-│   ├── main.py              # ASGI entry / app factory
-│   ├── providers/           # Bootstrap wiring (DI setup, startup hooks)
-│   ├── middleware/          # HTTP / ASGI cross-cutting
-│   ├── exceptions/          # Exception types + handlers
-│   └── helpers/             # Small shared pure helpers
-│
-├── config/
-│   ├── settings.py          # pydantic-settings (env)
-│   ├── database.py          # Engine / session factory config
-│   └── security.py          # JWT, password, CORS-related settings
-│
-├── routes/
-│   ├── api.py               # Mount API routers from modules
-│   └── web.py               # Optional non-API routes (health, docs redirects)
-│
-├── database/
-│   ├── connection.py        # Engine, SessionLocal, get_db
-│   ├── migrations/          # Alembic versions (or alembic/ versions linked here)
-│   └── seeders/             # Roles, admin user, demo data
-│
-├── storage/                 # Uploads, generated files (local disk; S3 later)
-├── public/                  # Static public assets if needed
-│
-├── modules/                 # Feature modules (see below)
-│
-└── tests/                   # Mirror modules + integration tests
+app/
+├── main.py              # ASGI entry / app factory
+├── providers/           # Bootstrap wiring (DI setup, startup hooks)
+├── middleware/          # HTTP / ASGI cross-cutting
+├── exceptions/          # Exception types + handlers
+└── helpers/             # Small shared pure helpers
+
+config/
+├── settings.py          # pydantic-settings (env)
+├── database.py          # Engine / session factory config
+└── security.py          # JWT, password, CORS-related settings
+
+routes/
+├── api.py               # Mount API routers from modules
+└── web.py               # Optional non-API routes (health, docs redirects)
+
+database/
+├── connection.py        # Engine, SessionLocal, get_db
+├── migrations/          # Alembic versions (or alembic/ versions linked here)
+└── seeders/             # Roles, admin user, demo data
+
+storage/                 # Uploads, generated files (local disk; S3 later)
+public/                  # Static public assets if needed
+modules/                 # Feature modules (see below)
+tests/                   # Mirror modules + integration tests
+pyproject.toml           # uv / project metadata
 ```
 
 ### Folder responsibilities
@@ -645,17 +648,16 @@ pydantic-settings
 **Files created**
 
 ```text
-backend/
-  app/main.py
-  app/providers/
-  app/middleware/          # may be empty stubs
-  app/exceptions/
-  app/helpers/
-  config/settings.py
-  routes/api.py
-  routes/web.py
-  .env.example
-  pyproject.toml
+app/main.py
+app/providers/
+app/middleware/          # may be empty stubs
+app/exceptions/
+app/helpers/
+config/settings.py
+routes/api.py
+routes/web.py
+.env.example
+pyproject.toml
 ```
 
 **Implementation steps**
@@ -717,12 +719,11 @@ alembic
 **Files created**
 
 ```text
-backend/
-  config/database.py
-  database/connection.py
-  database/migrations/     # Alembic versions
-  database/seeders/
-  # shared DeclarativeBase (location you choose under database/ or app/)
+config/database.py
+database/connection.py
+database/migrations/     # Alembic versions
+database/seeders/
+# shared DeclarativeBase (location you choose under database/ or app/)
 ```
 
 **Implementation steps**
@@ -1415,7 +1416,11 @@ _Pending_
 
 #### Phase 1
 
-_Pending_
+- Layout: Python app at **repo root** (no nested `backend/`). `frontend/` sibling later.
+- Branding: product name **FastShop** (`APP_NAME`, settings default, package `fastshop`).
+- Python: `requires-python >=3.12`, `.python-version` = `3.12`.
+- Settings: `.env` resolved from project root via `Path(__file__)`, not cwd.
+- `pydd`: kept as **dev** dependency (local path `../pydd`).
 
 #### Phase 2
 
