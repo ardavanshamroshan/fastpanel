@@ -21,6 +21,7 @@ site_build
 venv
 docs.zip
 archive.zip
+*.zip
 
 # vim temporary files
 *~
@@ -34,3 +35,6 @@ archive.zip
 
 # .env
 .env
+
+.venv/
+.ruff_cache/

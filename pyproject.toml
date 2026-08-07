@@ -1,0 +1,26 @@
+[project]
+name = "fastpanel"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+    "pydantic-settings>=2.14.2",
+    "uvicorn>=0.52.1",
+]
+
+[dependency-groups]
+dev = [
+    "pydd",
+    "ruff>=0.16.1",
+]
+
+[tool.ruff]
+line-length = 88
+src = ["."]
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.uv.sources]
+pydd = { path = "../pydd" }
