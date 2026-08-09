@@ -4,23 +4,26 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from config.app import AppConfig
+from config.auth import AuthConfig
+from config.database import DatabaseConfig
+from config.logging import LoggingConfig
+
 # config/settings.py → parents[1] = project root (where .env lives)
 _ROOT = Path(__file__).resolve().parents[1]
 
 
 class Settings(BaseSettings):
+    app: AppConfig = Field(default_factory=AppConfig)
+    database: DatabaseConfig = Field(default_factory=DatabaseConfig)
+    auth: AuthConfig = Field(default_factory=AuthConfig)
+    logging: LoggingConfig = Field(default_factory=LoggingConfig)
+
     model_config = SettingsConfigDict(
         env_file=_ROOT / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
-
-    app_name: str = Field(default="FastShop")
-    app_env: str = Field(default="local")
-    app_debug: bool = Field(default=True)
-    app_host: str = Field(default="0.0.0.0")
-    app_port: int = Field(default=8000)
-    log_level: str = Field(default="INFO")
 
 
 @lru_cache
