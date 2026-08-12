@@ -15,7 +15,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pydd",
+    "pydd-web>=0.2.2",
     "ruff>=0.16.1",
 ]
 
@@ -24,6 +24,3 @@ line-length = 88
 src = ["."]
 [tool.ruff.lint]
 select = ["E", "F", "I"]
-
-[tool.uv.sources]
-pydd = { path = "../pydd" }

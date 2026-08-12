@@ -269,7 +269,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "pydd" },
+    { name = "pydd-web" },
     { name = "ruff" },
 ]
 
@@ -285,7 +285,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pydd", directory = "../pydd" },
+    { name = "pydd-web", specifier = ">=0.2.2" },
     { name = "ruff", specifier = ">=0.16.1" },
 ]
 
@@ -715,36 +715,25 @@ wheels = [
 ]
 
 [[package]]
-name = "pydd"
-version = "0.2.1"
-source = { directory = "../pydd" }
+name = "pydd-web"
+version = "0.2.2"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pydump" },
+    { name = "pydump-dd" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "django", marker = "extra == 'all'", specifier = ">=4.2" },
-    { name = "django", marker = "extra == 'django'", specifier = ">=4.2" },
-    { name = "fastapi", marker = "extra == 'all'", specifier = ">=0.100.0" },
-    { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.100.0" },
-    { name = "fastapi", extras = ["standard"], marker = "extra == 'dev'", specifier = ">=0.100.0" },
-    { name = "flask", marker = "extra == 'all'", specifier = ">=2.3.0" },
-    { name = "flask", marker = "extra == 'flask'", specifier = ">=2.3.0" },
-    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
-    { name = "pydump", editable = "../pydump" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/83/4d/81fe786b6460c72823de27e959ef6fae27f43e86634535064df403f796f9/pydd_web-0.2.2.tar.gz", hash = "sha256:c13339f887ad2a7428e22d72c5206c047ee79cabe9e165df285c790493bf5c00", size = 9786, upload-time = "2026-08-12T10:57:32.426Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/0d/85265eae723d5c2b1f8dcdd003fce9e5da5140a5e732055a87346cd55293/pydd_web-0.2.2-py3-none-any.whl", hash = "sha256:4a4ba7430a2b27c8bf4ede2e0c3b734276f5468ee9ba8fd3f29d9b39c2679d8a", size = 12720, upload-time = "2026-08-12T10:57:31.123Z" },
 ]
-provides-extras = ["fastapi", "flask", "django", "all", "dev"]
 
 [[package]]
-name = "pydump"
-version = "0.2.1"
-source = { editable = "../pydump" }
-
-[package.metadata]
-requires-dist = [{ name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" }]
-provides-extras = ["dev"]
+name = "pydump-dd"
+version = "0.2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/22/7ead0f3c0a9dc75bd60e9d748670aa59550faa0ba0fe4bc7b95827e4e14a/pydump_dd-0.2.2.tar.gz", hash = "sha256:63a871cbd2f3c7507e9e25a0f0fd6f64a0fdeb0145e843f10c6a93593e18beca", size = 9015, upload-time = "2026-08-12T10:56:57.792Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/23/d2/ef8709c75b01c3c6e22a1ae6c754c32dea14bcbbb39ec6b8d3c6348c9217/pydump_dd-0.2.2-py3-none-any.whl", hash = "sha256:cfbf3c12f151e7b07a5ce4c45b009b2da1024fa08d8b51c127c9996bd68f1598", size = 10836, upload-time = "2026-08-12T10:56:56.385Z" },
+]
 
 [[package]]
 name = "pygments"
