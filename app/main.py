@@ -15,14 +15,14 @@ def create_app() -> FastAPI:
     settings = get_settings()
 
     app = FastAPI(
-        title=settings.app_name,
-        debug=settings.app_debug,
+        title=settings.app.app_name,
+        debug=settings.app.app_debug,
     )
 
     app.include_router(web_router)
     app.include_router(api_router)
 
-    logger.info("App started env=%s", settings.app_env)
+    logger.info("App started env=%s", settings.app.app_env)
 
     return app
 

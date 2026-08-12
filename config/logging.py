@@ -1,17 +1,24 @@
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _ROOT = Path(__file__).resolve().parents[1]
 
 
-class LoggingConfig(BaseModel):
+class LoggingConfig(BaseSettings):
     log_channel: str = Field(default="single")
     log_level: str = Field(default="INFO")
     log_format: str = Field(
         default="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     log_path: str = Field(default=f"{_ROOT}/storage/app/logs/app.log")
+
+    model_config = SettingsConfigDict(
+        env_file=_ROOT / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     @property
     def channels(self) -> dict:

@@ -1,7 +1,12 @@
-from pydantic import BaseModel, Field
+from pathlib import Path
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_ROOT = Path(__file__).resolve().parents[1]
 
 
-class DatabaseConfig(BaseModel):
+class DatabaseConfig(BaseSettings):
     db_connection: str = Field(default="postgresql")
     db_driver: str = Field(default="psycopg")
     db_host: str = Field(default="127.0.0.1")
@@ -10,6 +15,12 @@ class DatabaseConfig(BaseModel):
     db_username: str = Field(default="root")
     db_password: str = Field(default="password")
     db_charset: str = Field(default="utf8")
+
+    model_config = SettingsConfigDict(
+        env_file=_ROOT / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     @property
     def database_url(self) -> str:
