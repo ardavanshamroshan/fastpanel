@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import FastAPI
+from pydd import *  # noqa: F403
 
 from app.helpers.logging import setup_logging
 from config.settings import get_settings
